@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>MechBees Voucher Management</title>
+<style>
+:root{--primary:#0f172a;--accent:#16a34a;--danger:#dc2626;--bg:#f1f5f9;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{min-height:100vh}.header{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:10px;background:#fff;color:#0f172a;display:grid;place-items:center;font-weight:800;font-size:19px}.brand h1{margin:0;font-size:21px}.brand small{color:#cbd5e1}
+.container{max-width:1250px;margin:auto;padding:22px}.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}.tab{border:1px solid var(--border);background:#fff;padding:10px 16px;border-radius:8px;font-weight:700}.tab.active{background:var(--primary);color:#fff}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 3px 12px #00000008}.card h2{margin:0 0 16px;font-size:18px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.full{grid-column:1/-1}.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:10px 11px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:#64748b}.field textarea{min-height:78px;resize:vertical}
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px}.type-toggle label{position:relative}.type-toggle input{position:absolute;opacity:0}.type-toggle span{display:block;text-align:center;padding:11px;border:2px solid var(--border);border-radius:8px;font-weight:800}.type-toggle input:checked+span.credit{border-color:var(--accent);background:#f0fdf4;color:#15803d}.type-toggle input:checked+span.debit{border-color:var(--danger);background:#fef2f2;color:#b91c1c}
+.amount-box{background:#f8fafc;border:1px dashed #94a3b8;border-radius:10px;padding:15px}.amount-box input{font-size:24px;font-weight:800}
+.amount-words{margin-top:8px;color:#475569;font-size:13px;min-height:18px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:8px;padding:10px 14px;font-weight:700}.primary{background:var(--primary);color:#fff}.green{background:var(--accent);color:#fff}.red{background:var(--danger);color:#fff}.light{background:#e2e8f0;color:#0f172a}.outline{background:#fff;border:1px solid #cbd5e1}
+.preview{background:#fff;border:1px solid #cbd5e1;padding:25px;min-height:450px}.voucher-head{display:flex;justify-content:space-between;gap:15px;border-bottom:2px solid #0f172a;padding-bottom:14px}.company h2{margin:0;font-size:20px}.company p{margin:5px 0;color:#64748b;font-size:12px}.vtitle{text-align:right}.vtitle h1{margin:0;font-size:24px}.badge{display:inline-block;padding:5px 9px;border-radius:20px;font-size:11px;font-weight:800}.badge.credit{background:#dcfce7;color:#166534}.badge.debit{background:#fee2e2;color:#991b1b}.meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.meta div{border:1px solid #e2e8f0;padding:9px}.meta b{display:block;font-size:11px;color:#64748b;margin-bottom:4px}.particular{border:1px solid #cbd5e1;min-height:95px;padding:12px}.total{display:flex;justify-content:flex-end;margin-top:15px}.total-box{min-width:250px;border:2px solid #0f172a;padding:12px}.total-box span{font-size:12px;color:#64748b}.total-box strong{display:block;font-size:25px;margin-top:4px}.sign{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:55px}.sign div{border-top:1px solid #94a3b8;text-align:center;padding-top:8px;font-size:12px;color:#475569}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}.stat{background:#fff;border:1px solid var(--border);border-radius:10px;padding:15px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:22px;margin-top:6px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.toolbar input,.toolbar select{padding:9px;border:1px solid #cbd5e1;border-radius:8px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;background:#fff}.table th,.table td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:13px;white-space:nowrap}.table th{background:#f8fafc}.credit-text{color:#15803d;font-weight:700}.debit-text{color:#b91c1c;font-weight:700}.empty{text-align:center;padding:30px;color:#64748b}
+.settings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.toast{position:fixed;right:20px;bottom:20px;background:#0f172a;color:#fff;padding:12px 16px;border-radius:8px;display:none;z-index:20}.toast.show{display:block}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.show{display:flex}.modal-card{background:#fff;border-radius:12px;max-width:520px;width:100%;padding:20px}.modal-card h3{margin-top:0}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.form-grid,.settings-grid{grid-template-columns:1fr}.full{grid-column:auto}.preview{padding:15px}.voucher-head{flex-direction:column}.vtitle{text-align:left}.meta{grid-template-columns:1fr}.stats{grid-template-columns:1fr}}
+@media print{
+ body{background:#fff}.header,.tabs,.no-print,#dashboard,#history,#settings{display:none!important}.container{padding:0;max-width:none}.grid{display:block}.card.form-card{display:none}.card.preview-card{border:0;box-shadow:none;padding:0}.preview{border:0;min-height:0}.toast{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header no-print">
+  <div class="brand"><div class="logo">MB</div><div><h1>MechBees Voucher Management</h1><small>Credit & Debit Voucher System</small></div></div>
+  <div><button class="btn green" onclick="newVoucher()">+ New Voucher</button></div>
+</header>
+
+<div class="container">
+  <div class="tabs no-print">
+    <button class="tab active" data-page="voucher">Create Voucher</button>
+    <button class="tab" data-page="dashboard">Dashboard</button>
+    <button class="tab" data-page="history">Voucher History</button>
+    <button class="tab" data-page="settings">Company Settings</button>
+  </div>
+
+  <section id="voucher">
+    <div class="grid">
+      <div class="card form-card">
+        <h2 id="formTitle">Create Voucher</h2>
+        <form id="voucherForm">
+          <div class="field" style="margin-bottom:13px">
+            <label>Voucher Type</label>
+            <div class="type-toggle">
+              <label><input type="radio" name="type" value="Credit" checked><span class="credit">CREDIT VOUCHER</span></label>
+              <label><input type="radio" name="type" value="Debit"><span class="debit">DEBIT VOUCHER</span></label>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>Voucher Number</label><input id="voucherNo" readonly></div>
+            <div class="field"><label>Date</label><input id="voucherDate" type="date" required></div>
+            <div class="field"><label>Party / Customer / Supplier Name</label><input id="partyName" required placeholder="Enter name"></div>
+            <div class="field"><label>Mobile Number</label><input id="mobile" inputmode="numeric" placeholder="10 digit mobile"></div>
+            <div class="field"><label>Payment Mode</label><select id="paymentMode"><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Cheque</option><option>Card</option><option>Other</option></select></div>
+            <div class="field"><label>Reference / Transaction No.</label><input id="reference" placeholder="Optional"></div>
+            <div class="field full"><label>Particulars / Description</label><textarea id="particulars" placeholder="Reason / transaction description"></textarea></div>
+            <div class="field full amount-box"><label>Amount (₹)</label><input id="amount" type="number" min="0" step="0.01" required placeholder="0.00"><div id="amountWords" class="amount-words"></div></div>
+            <div class="field"><label>Prepared By</label><input id="preparedBy" placeholder="Name"></div>
+            <div class="field"><label>Authorized By</label><input id="authorizedBy" placeholder="Name"></div>
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn green">Save & Send WhatsApp</button>
+            <button type="button" class="btn light" onclick="newVoucher()">Clear / New</button>
+            
+          </div>
+        </form>
+      </div>
+
+      <div class="card preview-card">
+        <h2 class="no-print">Live Preview</h2>
+        <div id="preview" class="preview"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="dashboard" style="display:none">
+    <div class="stats">
+      <div class="stat"><small>Total Vouchers</small><strong id="statCount">0</strong></div>
+      <div class="stat"><small>Total Credit</small><strong id="statCredit">₹0.00</strong></div>
+      <div class="stat"><small>Total Debit</small><strong id="statDebit">₹0.00</strong></div>
+    </div>
+    <div class="card">
+      <h2>Quick Summary</h2>
+      <p id="netSummary">No vouchers saved yet.</p>
+    </div>
+  </section>
+
+  <section id="history" style="display:none">
+    <div class="card">
+      <h2>Voucher History</h2>
+      <div class="toolbar">
+        <input id="searchBox" placeholder="Search voucher / party / reference">
+        <select id="filterType"><option value="">All Types</option><option>Credit</option><option>Debit</option></select>
+        <input id="fromDate" type="date" title="From date">
+        <input id="toDate" type="date" title="To date">
+        <button class="btn light" onclick="renderHistory()">Filter</button>
+        <button class="btn outline" onclick="exportCSV()">Export CSV</button>
+        <button class="btn red" onclick="clearAll()">Delete All</button>
+      </div>
+      <div class="table-wrap">
+        <table class="table"><thead><tr><th>No.</th><th>Date</th><th>Type</th><th>Party</th><th>Mode</th><th>Amount</th><th>Actions</th></tr></thead>
+        <tbody id="historyBody"></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <section id="settings" style="display:none">
+    <div class="card">
+      <h2>Company Settings</h2>
+      <div class="settings-grid">
+        <div class="field"><label>Company Name</label><input id="setCompany" value="MechBees Smart Mobility Pvt. Ltd."></div>
+        <div class="field"><label>Tagline</label><input id="setTagline" value="Smart Mobility | EV & Battery Solutions"></div>
+        <div class="field"><label>Address</label><input id="setAddress" placeholder="Company address"></div>
+        <div class="field"><label>Phone</label><input id="setPhone" placeholder="Phone number"></div>
+        <div class="field"><label>Email</label><input id="setEmail" placeholder="Email address"></div>
+        <div class="field"><label>GSTIN</label><input id="setGSTIN" placeholder="Optional"></div>
+      </div>
+      <div class="actions"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn light" onclick="loadSettings()">Reset Form</button></div>
+    </div>
+  </section>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const KEY='mechbees_vouchers_v1', SETKEY='mechbees_voucher_settings_v1';
+let vouchers=JSON.parse(localStorage.getItem(KEY)||'[]');
+let settings=JSON.parse(localStorage.getItem(SETKEY)||'{}');
+let editingId=null;
+
+const $=id=>document.getElementById(id);
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const today=()=>new Date().toISOString().slice(0,10);
+
+function nextNo(type='Credit'){
+  const prefix=type==='Credit'?'MB-CR-':'MB-DR-';
+  const nums=vouchers.filter(v=>v.type===type).map(v=>parseInt(v.voucherNo.replace(/\D/g,''))||0);
+  const next=(Math.max(0,...nums)+1).toString().padStart(4,'0');
+  return prefix+next;
+}
+function setDefault(){
+  $('voucherNo').value=nextNo(document.querySelector('input[name=type]:checked').value);
+  $('voucherDate').value=today();
+  $('partyName').value='';$('mobile').value='';$('reference').value='';$('particulars').value='';
+  $('paymentMode').value='Cash';$('amount').value='';$('preparedBy').value='';$('authorizedBy').value='';
+  $('amountWords').textContent='';editingId=null;$('formTitle').textContent='Create Voucher';updatePreview();
+}
+function newVoucher(){setDefault();showPage('voucher');}
+function numberWords(n){
+  n=Math.floor(Number(n)||0); if(n===0)return 'Zero Rupees Only';
+  const ones=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  const tens=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  function two(x){if(x<20)return ones[x];return tens[Math.floor(x/10)]+(x%10?' '+ones[x%10]:'')}
+  function under1000(x){return (x>=100?ones[Math.floor(x/100)]+' Hundred'+(x%100?' ':''): '')+(x%100?two(x%100):'')}
+  let parts=[];
+  const crore=Math.floor(n/10000000); n%=10000000;
+  const lakh=Math.floor(n/100000); n%=100000;
+  const thousand=Math.floor(n/1000); n%=1000;
+  if(crore)parts.push(under1000(crore)+' Crore'); if(lakh)parts.push(under1000(lakh)+' Lakh'); if(thousand)parts.push(under1000(thousand)+' Thousand'); if(n)parts.push(under1000(n));
+  return parts.join(' ')+' Rupees Only';
+}
+function updatePreview(){
+  const type=document.querySelector('input[name=type]:checked').value;
+  const s=settings;
+  const amount=Number($('amount').value||0);
+  $('amountWords').textContent=amount?numberWords(amount):'';
+  $('preview').innerHTML=`
+    <div class="voucher-head">
+      <div class="company"><h2>${esc(s.company||'MechBees Smart Mobility Pvt. Ltd.')}</h2><p>${esc(s.tagline||'Smart Mobility | EV & Battery Solutions')}</p><p>${esc(s.address||'')}${s.phone?' | '+esc(s.phone):''}</p>${s.email?`<p>${esc(s.email)}</p>`:''}${s.gstin?`<p><b>GSTIN:</b> ${esc(s.gstin)}</p>`:''}</div>
+      <div class="vtitle"><h1>${type.toUpperCase()} VOUCHER</h1><span class="badge ${type.toLowerCase()}">${type.toUpperCase()}</span></div>
+    </div>
+    <div class="meta">
+      <div><b>VOUCHER NO.</b>${esc($('voucherNo').value)}</div><div><b>DATE</b>${esc($('voucherDate').value)}</div>
+      <div><b>PARTY NAME</b>${esc($('partyName').value||'-')}</div><div><b>MOBILE</b>${esc($('mobile').value||'-')}</div>
+      <div><b>PAYMENT MODE</b>${esc($('paymentMode').value)}</div><div><b>REFERENCE</b>${esc($('reference').value||'-')}</div>
+    </div>
+    <div><b style="font-size:11px;color:#64748b">PARTICULARS</b><div class="particular">${esc($('particulars').value||'-')}</div></div>
+    <div class="total"><div class="total-box"><span>AMOUNT</span><strong>${money(amount)}</strong><span>${esc(amount?numberWords(amount):'')}</span></div></div>
+    <div class="sign"><div>Prepared By<br><b>${esc($('preparedBy').value||'')}</b></div><div>Authorized By<br><b>${esc($('authorizedBy').value||'')}</b></div></div>
+    <p style="margin-top:35px;font-size:10px;color:#64748b;text-align:center">This is a computer-generated voucher.</p>`;
+}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function getForm(){
+ return {id:editingId||crypto.randomUUID(),voucherNo:$('voucherNo').value,date:$('voucherDate').value,type:document.querySelector('input[name=type]:checked').value,party:$('partyName').value,mobile:$('mobile').value,paymentMode:$('paymentMode').value,reference:$('reference').value,particulars:$('particulars').value,amount:Number($('amount').value||0),preparedBy:$('preparedBy').value,authorizedBy:$('authorizedBy').value,createdAt:new Date().toISOString()};
+}
+$('voucherForm').addEventListener('submit',e=>{
+ e.preventDefault(); const v=getForm();
+ if(!v.party||v.amount<=0){toast('Enter party name and amount greater than 0.');return}
+ const i=vouchers.findIndex(x=>x.id===v.id);
+ if(i>=0)vouchers[i]=v; else vouchers.push(v);
+ localStorage.setItem(KEY,JSON.stringify(vouchers));
+ updateStats(); renderHistory();
+ toast(editingId?'Voucher updated. Opening WhatsApp...':'Voucher saved. Opening WhatsApp...');
+ openWhatsAppMessage(v);
+ setTimeout(()=>newVoucher(),400);
+});
+document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',updatePreview));
+document.querySelectorAll('input[name=type]').forEach(el=>el.addEventListener('change',()=>{if(!editingId)$('voucherNo').value=nextNo(el.value);updatePreview()}));
+
+function showPage(page){
+ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.page===page));
+ ['voucher','dashboard','history','settings'].forEach(p=>$(p).style.display=p===page?'block':'none');
+ if(page==='dashboard')updateStats(); if(page==='history')renderHistory(); if(page==='settings')loadSettings();
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showPage(t.dataset.page)));
+
+function renderHistory(){
+ const q=$('searchBox').value.toLowerCase(), ft=$('filterType').value, fd=$('fromDate').value, td=$('toDate').value;
+ let arr=vouchers.filter(v=>(!q||[v.voucherNo,v.party,v.reference,v.mobile].join(' ').toLowerCase().includes(q))&&(!ft||v.type===ft)&&(!fd||v.date>=fd)&&(!td||v.date<=td)).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
+ $('historyBody').innerHTML=arr.length?arr.map(v=>`<tr><td>${esc(v.voucherNo)}</td><td>${esc(v.date)}</td><td class="${v.type==='Credit'?'credit-text':'debit-text'}">${v.type}</td><td>${esc(v.party)}</td><td>${esc(v.paymentMode)}</td><td>${money(v.amount)}</td><td><button class="btn light" onclick="editVoucher('${v.id}')">Edit</button> <button class="btn green" onclick="printSaved('${v.id}')">Print</button> <button class="btn green" onclick="sendWhatsApp('${v.id}')">WhatsApp</button> <button class="btn red" onclick="deleteVoucher('${v.id}')">Delete</button></td></tr>`).join(''):`<tr><td colspan="7" class="empty">No vouchers found.</td></tr>`;
+}
+function editVoucher(id){
+ const v=vouchers.find(x=>x.id===id);if(!v)return;editingId=id;
+ $('voucherNo').value=v.voucherNo;$('voucherDate').value=v.date;$('partyName').value=v.party;$('mobile').value=v.mobile;$('paymentMode').value=v.paymentMode;$('reference').value=v.reference;$('particulars').value=v.particulars;$('amount').value=v.amount;$('preparedBy').value=v.preparedBy;$('authorizedBy').value=v.authorizedBy;
+ document.querySelector(`input[name=type][value="${v.type}"]`).checked=true;$('formTitle').textContent='Edit Voucher';updatePreview();showPage('voucher');
+}
+function deleteVoucher(id){if(confirm('Delete this voucher?')){vouchers=vouchers.filter(v=>v.id!==id);localStorage.setItem(KEY,JSON.stringify(vouchers));renderHistory();updateStats();toast('Voucher deleted');}}
+function clearAll(){if(vouchers.length&&confirm('Delete ALL saved vouchers from this browser?')){vouchers=[];localStorage.setItem(KEY,'[]');renderHistory();updateStats();toast('All vouchers deleted');}}
+function updateStats(){
+ const c=vouchers.filter(v=>v.type==='Credit').reduce((a,v)=>a+v.amount,0),d=vouchers.filter(v=>v.type==='Debit').reduce((a,v)=>a+v.amount,0);
+ $('statCount').textContent=vouchers.length;$('statCredit').textContent=money(c);$('statDebit').textContent=money(d);
+ const net=c-d;$('netSummary').innerHTML=`Credit: <b>${money(c)}</b> &nbsp; | &nbsp; Debit: <b>${money(d)}</b> &nbsp; | &nbsp; Net: <b>${money(net)}</b> ${net>=0?'Credit balance':'Debit balance'}.`;
+}
+function printVoucher(){updatePreview();window.print()}
+function printSaved(id){editVoucher(id);setTimeout(()=>window.print(),100)}
+function saveSettings(){
+ settings={company:$('setCompany').value,tagline:$('setTagline').value,address:$('setAddress').value,phone:$('setPhone').value,email:$('setEmail').value,gstin:$('setGSTIN').value};
+ localStorage.setItem(SETKEY,JSON.stringify(settings));toast('Company settings saved');updatePreview();
+}
+function loadSettings(){
+ $('setCompany').value=settings.company||'MechBees Smart Mobility Pvt. Ltd.';$('setTagline').value=settings.tagline||'Smart Mobility | EV & Battery Solutions';$('setAddress').value=settings.address||'';$('setPhone').value=settings.phone||'';$('setEmail').value=settings.email||'';$('setGSTIN').value=settings.gstin||'';
+}
+function buildWhatsAppMessage(v){
+  const icon = v.type === 'Credit' ? '🟢' : '🔴';
+  return `${icon} *MECHBEES ${v.type.toUpperCase()} VOUCHER*
+
+*Voucher No:* ${v.voucherNo}
+*Date:* ${v.date}
+*Party:* ${v.party || '-'}
+*Mobile:* ${v.mobile || '-'}
+*Payment Mode:* ${v.paymentMode || '-'}
+*Reference:* ${v.reference || '-'}
+*Amount:* ${money(v.amount)}
+
+*Particulars:* ${v.particulars || '-'}
+
+*Prepared By:* ${v.preparedBy || '-'}
+*Authorized By:* ${v.authorizedBy || '-'}
+
+_MechBees Smart Mobility Pvt. Ltd._`;
+}
+
+function openWhatsAppMessage(v){
+  const message = buildWhatsAppMessage(v);
+  const url = 'https://wa.me/?text=' + encodeURIComponent(message);
+  window.open(url, '_blank');
+}
+
+function sendWhatsApp(id){
+  const v = vouchers.find(x => x.id === id);
+  if(!v){ toast('Voucher not found.'); return; }
+  openWhatsAppMessage(v);
+}
+
+function sendCurrentWhatsApp(){
+  const v = getForm();
+  if(!v.party || v.amount <= 0){
+    toast('Enter party name and amount first.');
+    return;
+  }
+  openWhatsAppMessage(v);
+}
+
+function exportCSV(){
+ const rows=[['Voucher No','Date','Type','Party','Mobile','Payment Mode','Reference','Particulars','Amount','Prepared By','Authorized By'],...vouchers.map(v=>[v.voucherNo,v.date,v.type,v.party,v.mobile,v.paymentMode,v.reference,v.particulars,v.amount,v.preparedBy,v.authorizedBy])];
+ const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='MechBees_Voucher_History.csv';a.click();URL.revokeObjectURL(a.href);
+}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
+loadSettings();setDefault();updateStats();renderHistory();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .catch(function (error) { console.error('PWA service worker:', error); });
+  });
+}
+</script>
+</body>
+</html>
